@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<title>Generador de clases UML con JavaScript | Parzibyte's apps</title>
+	<meta charset="UTF-8">
+	<meta name="viewport"
+		content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="twitter:image"
+		content="https://parzibyte.me/blog/wp-content/uploads/2019/02/Generador-de-diagramas-de-clase-UML-con-JavaScript-y-Canvas.png" />
+	<meta name="twitter:description" content="Generar diagrama de clases UML con JavaScript, Canvas y LocalStorage" />
+	<meta name="twitter:card" content="summary" />
+	<meta name="description" content="Generar diagrama de clases UML con JavaScript, Canvas y LocalStorage">
+	<meta property="og:image"
+		content="https://parzibyte.me/blog/wp-content/uploads/2019/02/Generador-de-diagramas-de-clase-UML-con-JavaScript-y-Canvas.png" />
+	<meta property="og:locale" content="es_LA" />
+	<meta property="og:url" content="https://www.parzibyte.me/apps/cotizaciones" />
+	<meta property="og:site_name" content="parzibyte.me" />
+	<meta property="og:title" content="Generador de clases UML con JavaScript | Parzibyte's apps" />
+	<meta property="og:description" content="Generar diagrama de clases UML con JavaScript, Canvas y LocalStorage" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+	<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.min.js"></script>
+</head>
+
+<body>
+	<section class="section" id="app">
+		<div class="container">
+			<div class="columns">
+				<div class="column">
+					<h4 class="is-size-4 has-text-centered">Generador de Modelos de clases para gente ocupada</h4>
+				</div>
+			</div>
+			<div v-show="diagramas.length > 0" class="columns">
+				<div class="column">
+					<div>
+						<a @click="mostrarGuardados = !mostrarGuardados">
+							{{mostrarGuardados ? 'Ocultar guardados' : 'Mostrar guardados'}}
+						</a>
+					</div>
+					<br>
+					<table v-show="diagramas.length > 0 && mostrarGuardados" class="table">
+						<thead>
+							<tr>
+								<th>
+									Título
+								</th>
+								<th>
+									Cargar
+								</th>
+								<th>
+									Eliminar
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="diagrama in diagramas">
+								<td>
+									{{diagrama.titulo}}
+								</td>
+								<td>
+									<button @click="cargar(diagrama.id)" class="button is-info">
+										<span class="icon is-small">
+											<i class="fas fa-folder-open"></i>
+										</span>
+									</button>
+								</td>
+								<td>
+									<button @click="eliminar(diagrama.id)" class="button is-danger">
+										<span class="icon is-small">
+											<i class="fas fa-trash"></i>
+										</span>
+									</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="columns">
+				<div class="column">
+					<div v-show="idEditado" class="notification is-primary">
+						Estás editando un diagrama, si deseas crear uno nuevo (cuidado, limpiará el formulario) <a
+							@click="nuevo">haz click aquí</a>
+					</div>
+					<div class="field">
+						<label class="label">Clase</label>
+						<div class="control">
+							<input @blur="refrescarImagen" v-model="diagrama.titulo" class="input" type="text"
+								placeholder="p.ej. Mascota">
+						</div>
+					</div>
+					<div class="field">
+						<label class="label">Propiedades</label>
+						<div class="control">
+							<textarea @blur="refrescarImagen" v-model="diagrama.propiedades" rows="2" class="textarea"
+								placeholder="Una por cada línea"></textarea>
+						</div>
+					</div>
+					<div class="field">
+						<label class="label">Métodos</label>
+						<div class="control">
+							<textarea @blur="refrescarImagen" v-model="diagrama.metodos" rows="2" class="textarea"
+								placeholder="Uno por cada línea"></textarea>
+						</div>
+					</div>
+					<div class="field">
+						<button @click="guardar" class="button is-rounded is-success">Guardar</button>
+						<button @click="descargar" class="button is-rounded is-primary">Descargar</button>
+					</div>
+				</div>
+				<div class="column" style="overflow: auto;">
+					<canvas ref="canvas" id="canvas"></canvas>
+				</div>
+			</div>
+
+		</div>
+	</section>
+	<footer class="footer">
+		<div class="content has-text-centered">
+			<p>
+				<strong>Generador de Modelos de clases online</strong> creado por <a href="https://parzibyte.me"
+					target="_blank">Parzibyte</a>.
+				Visita el
+				<a href="https://github.com/parzibyte/generador-uml-javascript" target="_blank">repositorio en GitHub</a>.
+				<br>
+				<strong>Más herramientas</strong><br>
+				<a href="https://www.parzibyte.me/apps/conversor_bases/" target="_blank">Conversor binario, octal,
+					decimal y hexadecimal</a><br>
+				<a href="https://www.parzibyte.me/apps/conversion-hexadecimal-decimal" target="_blank">Explicar
+					conversión hexadecimal a decimal</a>
+				<br>
+				Sígueme:
+
+				<a href="https://twitter.com/parzibyte" target="_blank">
+					<i class="fab fa-twitter"></i>
+				</a>
+				<a href="https://facebook.com/parzibyte.fanpage" target="_blank">
+					<i class="fab fa-facebook-square"></i>
+				</a>
+				<a href="https://github.com/parzibyte" target="_blank">
+					<i class="fab fa-github"></i>
+				</a>
+			</p>
+		</div>
+	</footer>
+	<script src="script.js"></script>
+</body>
+
+</html>
