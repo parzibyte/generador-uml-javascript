@@ -1,7 +1,8 @@
 const PIXELES_FUENTE_GRANDE = 30,
 	PIXELES_FUENTE_NORMAL = 20,
 	PIXELES_GRUESO_LINEA = 2,
-	SEPARACION_VERTICAL = 5;
+	SEPARACION_VERTICAL = 5,
+	PREFIJO_IDENTIFICADORES = "uml_";
 new Vue({
 	el: "#app",
 	data: () => ({
@@ -20,20 +21,22 @@ new Vue({
 	},
 	methods: {
 		uuid() {
-			return function b(a) { return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b) }();
+			return PREFIJO_IDENTIFICADORES + (function b(a) { return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b) }());
 		},
 		descargar() {
-			if(!this.diagrama.titulo) return;
+			if (!this.diagrama.titulo) return;
 			let enlace = document.createElement('a');
 			enlace.download = `${this.diagrama.titulo}.png`;
 			enlace.href = this.$refs.canvas.toDataURL();
 			enlace.click();
 		},
 		refrescarGuardados() {
-			this.diagramas = Object.keys(localStorage).map(clave => ({
-				id: clave,
-				titulo: JSON.parse(localStorage.getItem(clave)).titulo
-			}));
+			this.diagramas = Object.keys(localStorage)
+				.filter(clave => clave.startsWith(PREFIJO_IDENTIFICADORES))
+				.map(clave => ({
+					id: clave,
+					titulo: JSON.parse(localStorage.getItem(clave)).titulo
+				}));
 		},
 		cargar(id) {
 			let posibleDiagrama = localStorage.getItem(id);
